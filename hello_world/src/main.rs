@@ -7,7 +7,7 @@ fn main() -> std::io::Result<()>{
     let nx = 200;
     let ny = 100;
 
-    let file = File::create("eye_candy/hello_world.ppm")?;
+    let file = File::create("../eye_candy/hello_world.ppm")?;
     let mut file = LineWriter::new(file);
 
     // Write ppm format
