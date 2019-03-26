@@ -1,9 +1,8 @@
 [package]
-name = "hello_world"
+name = "png_builder"
 version = "0.1.0"
 authors = ["Smith <greatsimonsmith@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-vec3 = {path = "../vec3"}
 png = "0.14.0"
