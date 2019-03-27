@@ -6,4 +6,4 @@ edition = "2018"
 
 [dependencies]
 vec3 = {path = "../vec3"}
-png = "0.14.0"
+image = "*"
