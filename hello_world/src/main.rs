@@ -11,11 +11,14 @@ fn main() {
 
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let rgb = Vec3::new((x as f32) / (nx as f32), (y as f32) / (ny as f32), 0.2);
-        let r = (255.99*rgb.x) as u8;
-        let g = (255.99*rgb.y) as u8;
-        let b = (255.99*rgb.z) as u8;
-        *pixel = image::Rgb([r, g, b]);
+        let rgb_gradient = Vec3::new((x as f32) / (nx as f32), (y as f32) / (ny as f32), 0.2);
+        let rgb = 255.99 * rgb_gradient;
+
+        *pixel = image::Rgb([
+            rgb.x as u8,
+            rgb.y as u8,
+            rgb.z as u8,
+        ]);
     }
 
     // Flip the image on its y-axis, because I can
