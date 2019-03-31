@@ -1,4 +1,3 @@
-
 use vec3::Vec3;
 
 pub struct Ray {
@@ -8,7 +7,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(a: Vec3, b: Vec3) -> Self {
-        Ray{a:a, b:b}
+        Ray { a, b }
     }
     pub fn origin(self) -> Vec3 {
         self.a

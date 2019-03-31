@@ -1,9 +1,9 @@
 use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Mul;
 use std::ops::Div;
+use std::ops::Mul;
+use std::ops::Sub;
 
-type Real = f32;
+pub type Real = f32;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3 {
@@ -14,7 +14,7 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn new(x: Real, y: Real, z: Real) -> Self {
-        Vec3{x:x, y:y, z:z}
+        Vec3 { x, y, z }
     }
 
     pub fn length(self) -> Real {
@@ -30,7 +30,7 @@ impl Vec3 {
     }
 
     pub fn cross(self, rhs: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.y * rhs.z - self.z * self.y,
             y: -(self.x * rhs.z - self.z * self.x),
             z: self.x * rhs.y - self.y * self.x,
@@ -122,7 +122,6 @@ impl Div<Real> for Vec3 {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,9 +136,24 @@ mod tests {
 
     #[test]
     fn sub_test() {
-        let v1: Vec3 = Vec3{x:1.0, y:2.0, z:3.0};
-        let v2 = Vec3{x:1.0, y:-2.0, z:0.4};
+        let v1: Vec3 = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        let v2 = Vec3 {
+            x: 1.0,
+            y: -2.0,
+            z: 0.4,
+        };
         let v12 = v1 - v2;
-        assert_eq!(v12, Vec3{x:0.0, y:4.0, z:2.6});
+        assert_eq!(
+            v12,
+            Vec3 {
+                x: 0.0,
+                y: 4.0,
+                z: 2.6
+            }
+        );
     }
 }
