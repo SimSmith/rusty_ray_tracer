@@ -46,8 +46,8 @@ fn color(r: &Ray) -> Vec3 {
 fn hit_sphere(center: Vec3, radius: Real, r: &Ray) -> bool {
     let oc = r.origin() - center;
     let a = r.direction().dot(r.direction());
-    let b = 2. * oc.dot(r.direction());
+    let b = oc.dot(r.direction());
     let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4. * a * c;
+    let discriminant = b * b - a * c;
     discriminant > 0.
 }
