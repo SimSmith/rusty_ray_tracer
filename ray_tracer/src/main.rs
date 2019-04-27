@@ -30,12 +30,13 @@ fn main() {
     }
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("../eye_candy/sphere.png").unwrap();
+    imgbuf.save("../eye_candy/normal_sphere.png").unwrap();
 }
 
 fn color(r: &Ray) -> Vec3 {
-    if hit_sphere(Vec3::new(0., 0., -1.), 0.5, r) {
-        return Vec3::new(1., 0., 0.);
+    if let Some(t) = hit_sphere(Vec3::new(0., 0., -1.), 0.5, r) {
+        let n = (r.point_at_parameter(t) - Vec3::new(0., 0., -1.)).unit_vec();
+        return 0.5 * (n + Vec3::new(1., 1., 1.));
     }
     let unit_direction = r.direction().unit_vec();
     let t = 0.5 * (unit_direction.y + 1.);
@@ -43,11 +44,15 @@ fn color(r: &Ray) -> Vec3 {
     t * Vec3::new(1., 1., 1.) + (1. - t) * Vec3::new(0.5, 0.7, 1.)
 }
 
-fn hit_sphere(center: Vec3, radius: Real, r: &Ray) -> bool {
+fn hit_sphere(center: Vec3, radius: Real, r: &Ray) -> Option<Real> {
     let oc = r.origin() - center;
     let a = r.direction().dot(r.direction());
     let b = oc.dot(r.direction());
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - a * c;
-    discriminant > 0.
+    if discriminant < 0. {
+        None
+    } else {
+        Some(-(b + discriminant.sqrt()) / a)
+    }
 }
