@@ -1,5 +1,6 @@
 use vec3::Vec3;
 
+#[derive(Debug, Copy, Clone)]
 pub struct Ray {
     a: Vec3,
     b: Vec3,
