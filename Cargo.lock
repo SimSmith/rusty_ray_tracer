@@ -106,6 +106,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hello_world"
+version = "0.1.0"
+dependencies = [
+ "image 0.21.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vec3 0.1.0",
+]
+
+[[package]]
 name = "image"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -49,7 +49,7 @@ fn main() {
     }
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("../eye_candy/diffuse_sphere.png").unwrap();
+    imgbuf.save("eye_candy/diffuse_sphere.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList) -> Vec3 {
