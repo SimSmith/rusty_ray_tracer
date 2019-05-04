@@ -2,9 +2,11 @@ mod hitable;
 mod hitable_list;
 mod ray;
 mod sphere;
+mod camera;
 
 extern crate image;
 
+use camera::Camera;
 use hitable::Hitable;
 use hitable_list::HitableList;
 use ray::Ray;
@@ -18,21 +20,18 @@ fn main() {
 
     let mut imgbuf = image::ImageBuffer::new(width, height);
 
-    let upper_left_corner = Vec3::new(-2., 1., -1.);
-    let horizontal = Vec3::new(4., 0., 0.);
-    let vertical = Vec3::new(0., -2., 0.);
-    let origin = Vec3::new(0., 0., 0.);
     let world: HitableList = vec![
         Box::new(Sphere::new(Vec3::new(0., 0., -1.), 0.5)),
         Box::new(Sphere::new(Vec3::new(0., -100.5, -1.), 100.)),
     ];
+    let cam = Camera::new();
 
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let u = (x as Real) / (width as Real);
         let v = (y as Real) / (height as Real);
 
-        let r = Ray::new(origin, upper_left_corner + u * horizontal + v * vertical);
+        let r = cam.get_ray(u, v);
         let col = color(&r, &world);
         let rgb = 255.99 * col;
 
