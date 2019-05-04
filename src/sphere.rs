@@ -14,6 +14,10 @@ impl Sphere {
     pub fn new(center: Vec3, radius: Real, mat: Box<Material>) -> Self {
         Sphere { center, radius, mat }
     }
+
+    pub fn boxed(center: Vec3, radius: Real, mat: Box<Material>) -> Box<Self> {
+        Box::new(Sphere::new(center, radius, mat))
+    }
 }
 
 impl Hitable for Sphere {

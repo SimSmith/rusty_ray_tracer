@@ -26,36 +26,26 @@ fn main() {
     let mut imgbuf = image::ImageBuffer::new(width, height);
 
     let world: HitableList = vec![
-        Box::new(Sphere::new(
+        Sphere::boxed(
             Vec3::new(0., 0., -1.),
             0.5,
-            Box::new(Lambertian {
-                albedo: Vec3::new(0.8, 0.3, 0.3),
-            }),
-        )),
-        Box::new(Sphere::new(
+            Box::new(Lambertian { albedo: Vec3::new(0.8, 0.3, 0.3) }),
+        ),
+        Sphere::boxed(
             Vec3::new(0., -100.5, -1.),
             100.,
-            Box::new(Lambertian {
-                albedo: Vec3::new(0.8, 0.8, 0.),
-            }),
-        )),
-        Box::new(Sphere::new(
+            Box::new(Lambertian { albedo: Vec3::new(0.8, 0.8, 0.) }),
+        ),
+        Sphere::boxed(
             Vec3::new(1., 0., -1.),
             0.5,
-            Box::new(Metal {
-                albedo: Vec3::new(0.8, 0.6, 0.2),
-                fuzz: 1.,
-            }),
-        )),
-        Box::new(Sphere::new(
+            Metal::boxed(Vec3::new(0.8, 0.6, 0.2), 1.),
+        ),
+        Sphere::boxed(
             Vec3::new(-1., 0., -1.),
             0.5,
-            Box::new(Metal {
-                albedo: Vec3::new(0.8, 0.8, 0.8),
-                fuzz: 0.3,
-            }),
-        )),
+            Metal::boxed(Vec3::new(0.8, 0.8, 0.8), 0.3),
+        ),
     ];
     let cam = Camera::new();
     let mut rng = rand::thread_rng();

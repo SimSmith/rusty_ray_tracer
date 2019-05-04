@@ -25,8 +25,18 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3 {
 }
 
 pub struct Metal {
-    pub albedo: Vec3,
-    pub fuzz: Real,
+    albedo: Vec3,
+    fuzz: Real,
+}
+
+impl Metal {
+    pub fn new(albedo: Vec3, fuzz: Real) -> Self {
+        Metal { albedo, fuzz: fuzz.min(1.) }
+    }
+
+    pub fn boxed(albedo: Vec3, fuzz: Real) -> Box<Self> {
+        Box::new(Metal::new(albedo, fuzz))
+    }
 }
 
 impl Material for Metal {
