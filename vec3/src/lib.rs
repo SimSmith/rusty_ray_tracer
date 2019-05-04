@@ -20,7 +20,7 @@ impl Vec3 {
     }
 
     pub fn length(self) -> Real {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        self.dot(self).sqrt()
     }
 
     pub fn unit_vec(self) -> Self {
