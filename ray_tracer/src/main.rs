@@ -5,7 +5,10 @@ mod sphere;
 mod camera;
 
 extern crate image;
+extern crate rand;
 
+
+use rand::Rng;
 use camera::Camera;
 use hitable::Hitable;
 use hitable_list::HitableList;
@@ -17,6 +20,7 @@ use vec3::Vec3;
 fn main() {
     let width = 200;
     let height = 100;
+    let n_samples = 100;
 
     let mut imgbuf = image::ImageBuffer::new(width, height);
 
@@ -25,21 +29,26 @@ fn main() {
         Box::new(Sphere::new(Vec3::new(0., -100.5, -1.), 100.)),
     ];
     let cam = Camera::new();
+    let mut rng = rand::thread_rng();
+    let mut noise = || rng.gen_range(0., 1.);
 
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let u = (x as Real) / (width as Real);
-        let v = (y as Real) / (height as Real);
-
-        let r = cam.get_ray(u, v);
-        let col = color(&r, &world);
+        let mut col = Vec3::new(0., 0., 0.);
+        for _ in 0..n_samples {
+            let u = (x as Real + noise()) / (width as Real);
+            let v = (y as Real + noise()) / (height as Real);
+            let r = cam.get_ray(u, v);
+            col += color(&r, &world);
+        }
+        col /= n_samples as Real;
         let rgb = 255.99 * col;
 
         *pixel = image::Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8]);
     }
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("../eye_candy/normal_sphere.png").unwrap();
+    imgbuf.save("../eye_candy/aa_sphere.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList) -> Vec3 {

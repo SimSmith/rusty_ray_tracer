@@ -1,5 +1,7 @@
 use std::ops::Add;
+use std::ops::AddAssign;
 use std::ops::Div;
+use std::ops::DivAssign;
 use std::ops::Mul;
 use std::ops::Sub;
 
@@ -41,23 +43,33 @@ impl Vec3 {
 impl Add for Vec3 {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self {
+    fn add(self, rhs: Self) -> Self {
         Vec3 {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         }
+    }
+}
+
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = Vec3 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        };
     }
 }
 
 impl Sub for Vec3 {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, rhs: Self) -> Self {
         Vec3 {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         }
     }
 }
@@ -65,11 +77,11 @@ impl Sub for Vec3 {
 impl Mul for Vec3 {
     type Output = Self;
 
-    fn mul(self, other: Self) -> Self {
+    fn mul(self, rhs: Self) -> Self {
         Vec3 {
-            x: self.x * other.x,
-            y: self.y * other.y,
-            z: self.z * other.z,
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
         }
     }
 }
@@ -101,11 +113,11 @@ impl Mul<Vec3> for Real {
 impl Div for Vec3 {
     type Output = Self;
 
-    fn div(self, other: Self) -> Self {
+    fn div(self, rhs: Self) -> Self {
         Vec3 {
-            x: self.x / other.x,
-            y: self.y / other.y,
-            z: self.z / other.z,
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z,
         }
     }
 }
@@ -119,6 +131,16 @@ impl Div<Real> for Vec3 {
             y: self.y / rhs,
             z: self.z / rhs,
         }
+    }
+}
+
+impl DivAssign<Real> for Vec3 {
+    fn div_assign(&mut self, rhs: Real) {
+        *self = Vec3 {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        };
     }
 }
 
