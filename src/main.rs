@@ -18,38 +18,24 @@ fn main() {
 
     let mut imgbuf = image::ImageBuffer::new(width, height);
 
+    let r: Real = (std::f32::consts::PI/4.).cos();
     let world: HitableList = vec![
         Sphere::boxed(
-            Vec3::new(0., 0., -1.),
-            0.5,
+            Vec3::new(-r, 0., -1.),
+            r,
             Box::new(Lambertian {
-                albedo: Vec3::new(0.1, 0.2, 0.5),
+                albedo: Vec3::new(0., 0., 1.),
             }),
         ),
         Sphere::boxed(
-            Vec3::new(0., -100.5, -1.),
-            100.,
+            Vec3::new( r, 0., -1.),
+            r,
             Box::new(Lambertian {
-                albedo: Vec3::new(0.8, 0.8, 0.),
+                albedo: Vec3::new(1., 0., 0.),
             }),
-        ),
-        Sphere::boxed(
-            Vec3::new(1., 0., -1.),
-            0.5,
-            Metal::boxed(Vec3::new(0.8, 0.6, 0.2), 0.0),
-        ),
-        Sphere::boxed(
-            Vec3::new(-1., 0., -1.),
-            0.5,
-            Box::new(Dielectric { ref_idx: 1.5 }),
-        ),
-        Sphere::boxed(
-            Vec3::new(-1., 0., -1.),
-            -0.45,
-            Box::new(Dielectric { ref_idx: 1.5 }),
         ),
     ];
-    let cam = Camera::new();
+    let cam = Camera::viewport(90., width as Real / height as Real);
     let mut rng = rand::thread_rng();
     let mut noise = || rng.gen_range(0., 1.);
 
@@ -70,7 +56,7 @@ fn main() {
     }
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("eye_candy/refract_sphere.png").unwrap();
+    imgbuf.save("eye_candy/kissing_spheres.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
