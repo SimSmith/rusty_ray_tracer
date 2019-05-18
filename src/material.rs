@@ -1,4 +1,5 @@
 use crate::ray::Ray;
+use rand::Rng;
 use vec3::Real;
 use vec3::Vec3;
 
@@ -71,6 +72,12 @@ fn refract(v: Vec3, n: Vec3, ni_over_nt: Real) -> Option<Vec3> {
     }
 }
 
+fn schlick(cosine: Real, ref_idx: Real) -> Real {
+    let mut r0 = (1.-ref_idx) / (1.+ref_idx);
+    r0 *= r0;
+    r0 + (1.-r0)*(1.-cosine).powi(5)
+}
+
 pub struct Dielectric{
     pub ref_idx: Real,
 }
@@ -79,18 +86,24 @@ impl Material for Dielectric {
     fn scatter(&self, r_in: Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
         let reflected = reflect(r_in.direction(), normal);
         let attenuation = Vec3::new(1., 1., 1.);
-        let (outward_normal, ni_over_nt) = if r_in.direction().dot(normal) > 0. {
-            (-normal, self.ref_idx)
+        let cosine = self.ref_idx * r_in.direction().dot(normal) / r_in.direction().length();
+        let (outward_normal, ni_over_nt, cosine) = if r_in.direction().dot(normal) > 0. {
+            (-normal, self.ref_idx, cosine)
         } else {
-            (normal, 1./self.ref_idx)
+            (normal, 1./self.ref_idx, -cosine)
         };
-        if let Some(refracted) = refract(r_in.direction(), outward_normal, ni_over_nt) {
-            let scattered = Ray::new(point, refracted);
-            Some((attenuation, scattered))
+        let scattered = if let Some(refracted) = refract(r_in.direction(), outward_normal, ni_over_nt) {
+            let reflect_prob = schlick(cosine, self.ref_idx);
+            if rand::thread_rng().gen_range(0., 1.) < reflect_prob {
+                Ray::new(point, reflected)
+            }
+            else {
+                Ray::new(point, refracted)
+            }
         }
         else {
-            // Ray::new(point, reflected)
-            None
-        }
+            Ray::new(point, reflected)
+        };
+        Some((attenuation, scattered))
     }
 }

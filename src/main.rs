@@ -43,6 +43,11 @@ fn main() {
             0.5,
             Box::new(Dielectric { ref_idx: 1.5 }),
         ),
+        Sphere::boxed(
+            Vec3::new(-1., 0., -1.),
+            -0.45,
+            Box::new(Dielectric { ref_idx: 1.5 }),
+        ),
     ];
     let cam = Camera::new();
     let mut rng = rand::thread_rng();
