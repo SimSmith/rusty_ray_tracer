@@ -1,20 +1,13 @@
 mod camera;
 mod hitable;
-mod hitable_list;
 mod material;
 mod ray;
-mod sphere;
-
-extern crate image;
-extern crate rand;
 
 use camera::Camera;
-use hitable::Hitable;
-use hitable_list::HitableList;
+use hitable::{Hitable, HitableList, Sphere};
 use material::{Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
-use sphere::Sphere;
 use vec3::Real;
 use vec3::Vec3;
 
