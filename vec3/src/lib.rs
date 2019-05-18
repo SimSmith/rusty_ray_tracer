@@ -3,6 +3,7 @@ use std::ops::AddAssign;
 use std::ops::Div;
 use std::ops::DivAssign;
 use std::ops::Mul;
+use std::ops::Neg;
 use std::ops::Sub;
 
 pub type Real = f32;
@@ -106,6 +107,18 @@ impl Mul<Vec3> for Real {
             x: rhs.x * self,
             y: rhs.y * self,
             z: rhs.z * self,
+        }
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 }

@@ -5,7 +5,7 @@ mod ray;
 
 use camera::Camera;
 use hitable::{Hitable, HitableList, Sphere};
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use vec3::Real;
@@ -22,22 +22,26 @@ fn main() {
         Sphere::boxed(
             Vec3::new(0., 0., -1.),
             0.5,
-            Box::new(Lambertian { albedo: Vec3::new(0.8, 0.3, 0.3) }),
+            Box::new(Lambertian {
+                albedo: Vec3::new(0.1, 0.2, 0.5),
+            }),
         ),
         Sphere::boxed(
             Vec3::new(0., -100.5, -1.),
             100.,
-            Box::new(Lambertian { albedo: Vec3::new(0.8, 0.8, 0.) }),
+            Box::new(Lambertian {
+                albedo: Vec3::new(0.8, 0.8, 0.),
+            }),
         ),
         Sphere::boxed(
             Vec3::new(1., 0., -1.),
             0.5,
-            Metal::boxed(Vec3::new(0.8, 0.6, 0.2), 1.),
+            Metal::boxed(Vec3::new(0.8, 0.6, 0.2), 0.0),
         ),
         Sphere::boxed(
             Vec3::new(-1., 0., -1.),
             0.5,
-            Metal::boxed(Vec3::new(0.8, 0.8, 0.8), 0.3),
+            Box::new(Dielectric { ref_idx: 1.5 }),
         ),
     ];
     let cam = Camera::new();
@@ -61,7 +65,7 @@ fn main() {
     }
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("eye_candy/reflect_sphere.png").unwrap();
+    imgbuf.save("eye_candy/refract_sphere.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
