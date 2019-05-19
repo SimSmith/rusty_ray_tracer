@@ -1,4 +1,5 @@
 use vec3::Vec3;
+use vec3::Real;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -16,7 +17,7 @@ impl Ray {
     pub fn direction(self) -> Vec3 {
         self.b
     }
-    pub fn point_at_parameter(self, t: f32) -> Vec3 {
+    pub fn point_at_parameter(self, t: Real) -> Vec3 {
         self.a + t * self.b
     }
 }

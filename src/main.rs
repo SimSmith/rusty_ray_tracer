@@ -5,6 +5,7 @@ mod ray;
 
 use camera::Camera;
 use hitable::{Hitable, HitableList, Sphere};
+use image::{ImageBuffer, Rgb};
 use material::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -16,7 +17,7 @@ fn main() {
     let height = 100;
     let n_samples = 100;
 
-    let mut imgbuf = image::ImageBuffer::new(width, height);
+    let mut imgbuf = ImageBuffer::new(width, height);
 
     let world: HitableList = vec![
         Sphere::boxed(
@@ -49,7 +50,13 @@ fn main() {
             Box::new(Dielectric { ref_idx: 1.5 }),
         ),
     ];
-    let cam = Camera::viewport(Vec3::new(-2.0, 2.0, 1.0), Vec3::new(0., 0., -1.), Vec3::new(0., 1., 0.), 90., width as Real / height as Real);
+    let cam = Camera::viewport(
+        Vec3::new(-2.0, 2.0, 1.0),
+        Vec3::new(0., 0., -1.),
+        Vec3::new(0., 1., 0.),
+        90.,
+        width as Real / height as Real,
+    );
     let mut rng = rand::thread_rng();
     let mut noise = || rng.gen_range(0., 1.);
 
@@ -66,7 +73,7 @@ fn main() {
         col = Vec3::new(col.x.sqrt(), col.y.sqrt(), col.z.sqrt()); // gamma 2
         let rgb = 255.99 * col;
 
-        *pixel = image::Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8]);
+        *pixel = Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8]);
     }
 
     // Save the image, the format is deduced from the path
