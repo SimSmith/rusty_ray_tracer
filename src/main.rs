@@ -9,6 +9,7 @@ use image::{ImageBuffer, Rgb};
 use material::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
+use std::time::Instant;
 use vec3::Real;
 use vec3::Vec3;
 
@@ -58,14 +59,14 @@ fn main() {
         width as Real / height as Real,
     );
     let mut rng = rand::thread_rng();
-    let mut noise = || rng.gen_range(0., 1.);
 
+    let now = Instant::now();
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let mut col = Vec3::new(0., 0., 0.);
         for _ in 0..n_samples {
-            let u = (x as Real + noise()) / (width as Real);
-            let v = (y as Real + noise()) / (height as Real);
+            let u = (x as Real + rng.gen::<Real>()) / (width as Real);
+            let v = (y as Real + rng.gen::<Real>()) / (height as Real);
             let r = cam.get_ray(u, v);
             col += color(&r, &world, 0);
         }
@@ -75,6 +76,7 @@ fn main() {
 
         *pixel = Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8]);
     }
+    println!("Time: {} ms", now.elapsed().as_millis());
 
     // Save the image, the format is deduced from the path
     imgbuf.save("eye_candy/fly_camera.png").unwrap();
@@ -101,7 +103,7 @@ fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
 fn random_in_unit_sphere() -> Vec3 {
     let mut p: Vec3;
     let mut rng = rand::thread_rng();
-    let mut noise = || rng.gen_range(0., 1.);
+    let mut noise = || rng.gen::<Real>();
     while {
         p = 2. * Vec3::new(noise(), noise(), noise()) - Vec3::new(1., 1., 1.);
         p.dot(p) >= 1.

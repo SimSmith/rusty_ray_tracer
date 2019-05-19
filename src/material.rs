@@ -94,7 +94,7 @@ impl Material for Dielectric {
         let scattered =
             if let Some(refracted) = refract(r_in.direction(), outward_normal, ni_over_nt) {
                 let reflect_prob = schlick(cosine, self.ref_idx);
-                if rand::thread_rng().gen_range(0., 1.) < reflect_prob {
+                if rand::thread_rng().gen::<Real>() < reflect_prob {
                     Ray::new(point, reflected)
                 } else {
                     Ray::new(point, refracted)

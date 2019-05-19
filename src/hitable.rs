@@ -14,7 +14,7 @@ pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: Real, t_max: Real) -> Option<HitRecord>;
 }
 
-pub type HitableList = Vec<Box<Hitable>>;
+pub type HitableList = Vec<Box<dyn Hitable>>;
 
 impl Hitable for HitableList {
     fn hit(&self, r: &Ray, t_min: Real, t_max: Real) -> Option<HitRecord> {
