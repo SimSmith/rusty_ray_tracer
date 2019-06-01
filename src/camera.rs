@@ -26,8 +26,8 @@ impl Camera {
         let half_width = aspect * half_height;
 
         let w = (look_from - look_at).unit_vec();
-        let u = v_up.cross(w).unit_vec();
-        let v = w.cross(u);
+        let u = v_up.cross(&w).unit_vec();
+        let v = w.cross(&u);
 
         Camera {
             upper_left_corner: look_from - half_width * u + half_height * v - w,

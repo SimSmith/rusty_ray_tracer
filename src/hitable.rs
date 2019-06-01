@@ -33,11 +33,11 @@ impl Hitable for HitableList {
 pub struct Sphere {
     center: Vec3,
     radius: Real,
-    mat: Box<Material>,
+    mat: Box<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: Real, mat: Box<Material>) -> Self {
+    pub fn new(center: Vec3, radius: Real, mat: Box<dyn Material>) -> Self {
         Sphere {
             center,
             radius,
@@ -45,7 +45,7 @@ impl Sphere {
         }
     }
 
-    pub fn boxed(center: Vec3, radius: Real, mat: Box<Material>) -> Box<Self> {
+    pub fn boxed(center: Vec3, radius: Real, mat: Box<dyn Material>) -> Box<Self> {
         Box::new(Sphere::new(center, radius, mat))
     }
 }
@@ -53,9 +53,9 @@ impl Sphere {
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: Real, t_max: Real) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
-        let a = r.direction().dot(r.direction());
-        let b = oc.dot(r.direction());
-        let c = oc.dot(oc) - self.radius * self.radius;
+        let a = r.direction().dot(&r.direction());
+        let b = oc.dot(&r.direction());
+        let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
         if discriminant > 0. {
             let temp = (-b - discriminant.sqrt()) / a;

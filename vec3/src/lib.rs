@@ -20,7 +20,7 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
-    pub fn length(self) -> Real {
+    pub fn length(&self) -> Real {
         self.dot(self).sqrt()
     }
 
@@ -28,11 +28,11 @@ impl Vec3 {
         self / self.length()
     }
 
-    pub fn dot(self, rhs: Self) -> Real {
+    pub fn dot(&self, rhs: &Self) -> Real {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(self, rhs: Self) -> Self {
+    pub fn cross(&self, rhs: &Self) -> Self {
         Vec3 {
             x: self.y * rhs.z - self.z * rhs.y,
             y: -(self.x * rhs.z - self.z * rhs.x),

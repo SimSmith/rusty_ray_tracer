@@ -85,7 +85,7 @@ fn main() {
 fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
     let eps = 0.001; // to get rid of shadow acne
     if let Some(rec) = world.hit(r, eps, std::f32::MAX) {
-        let opt = rec.mat.scatter(*r, rec.p, rec.normal);
+        let opt = rec.mat.scatter(r, rec.p, rec.normal);
         if opt.is_some() && depth < 50 {
             let (attenuation, scattered) = opt.unwrap();
             attenuation * color(&scattered, world, depth + 1)
@@ -106,7 +106,7 @@ fn random_in_unit_sphere() -> Vec3 {
     let mut noise = || rng.gen::<Real>();
     while {
         p = 2. * Vec3::new(noise(), noise(), noise()) - Vec3::new(1., 1., 1.);
-        p.dot(p) >= 1.
+        p.dot(&p) >= 1.
     } { /* Black magic; do-while loop. */ }
     p
 }

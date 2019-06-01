@@ -4,7 +4,7 @@ use vec3::Real;
 use vec3::Vec3;
 
 pub trait Material {
-    fn scatter(&self, r_in: Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)>;
+    fn scatter(&self, r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)>;
 }
 
 // the lambertian class does not make sense
@@ -13,7 +13,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _r_in: Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
+    fn scatter(&self, _r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
         let target = point + normal + crate::random_in_unit_sphere();
         let attenuation = self.albedo;
         let scattered = Ray::new(point, target - point);
@@ -22,7 +22,7 @@ impl Material for Lambertian {
 }
 
 fn reflect(v: Vec3, n: Vec3) -> Vec3 {
-    v - 2. * v.dot(n) * n
+    v - 2. * v.dot(&n) * n
 }
 
 pub struct Metal {
@@ -44,14 +44,14 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, r_in: Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
+    fn scatter(&self, r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
         let reflected = reflect(r_in.direction().unit_vec(), normal);
         let attenuation = self.albedo;
         let scattered = Ray::new(
             point,
             reflected + self.fuzz * crate::random_in_unit_sphere(),
         );
-        if scattered.direction().dot(normal) > 0. {
+        if scattered.direction().dot(&normal) > 0. {
             Some((attenuation, scattered))
         } else {
             None
@@ -61,7 +61,7 @@ impl Material for Metal {
 
 fn refract(v: Vec3, n: Vec3, ni_over_nt: Real) -> Option<Vec3> {
     let uv = v.unit_vec();
-    let dt = uv.dot(n);
+    let dt = uv.dot(&n);
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1. - dt * dt);
     if discriminant > 0. {
         let refracted = ni_over_nt * (uv - n * dt) - n * discriminant.sqrt();
@@ -82,11 +82,11 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, r_in: Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
+    fn scatter(&self, r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)> {
         let reflected = reflect(r_in.direction(), normal);
         let attenuation = Vec3::new(1., 1., 1.);
-        let cosine = self.ref_idx * r_in.direction().dot(normal) / r_in.direction().length();
-        let (outward_normal, ni_over_nt, cosine) = if r_in.direction().dot(normal) > 0. {
+        let cosine = self.ref_idx * r_in.direction().dot(&normal) / r_in.direction().length();
+        let (outward_normal, ni_over_nt, cosine) = if r_in.direction().dot(&normal) > 0. {
             (-normal, self.ref_idx, cosine)
         } else {
             (normal, 1. / self.ref_idx, -cosine)
