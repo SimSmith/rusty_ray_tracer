@@ -51,15 +51,21 @@ fn main() {
             Box::new(Dielectric { ref_idx: 1.5 }),
         ),
     ];
+    let look_from = Vec3::new(3.0, 3.0, 2.0);
+    let look_at = Vec3::new(0., 0., -1.);
+    let aperture = 2.0;
+    let dist_to_focus = (look_from - look_at).length();
     let cam = Camera::viewport(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0., 0., -1.),
+        look_from,
+        look_at,
         Vec3::new(0., 1., 0.),
-        90.,
+        20.,
         width as Real / height as Real,
+        aperture,
+        dist_to_focus,
     );
-    let mut rng = rand::thread_rng();
 
+    let mut rng = rand::thread_rng();
     let now = Instant::now();
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
@@ -79,7 +85,7 @@ fn main() {
     println!("Time: {} ms", now.elapsed().as_millis());
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("eye_candy/fly_camera.png").unwrap();
+    imgbuf.save("eye_candy/focused_camera.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
