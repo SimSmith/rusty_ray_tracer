@@ -19,53 +19,25 @@ fn main() {
     let n_samples = 100;
 
     let mut imgbuf = ImageBuffer::new(width, height);
+    let world = random_scene();
 
-    let world: HitableList = vec![
-        Sphere::boxed(
-            Vec3::new(0., 0., -1.),
-            0.5,
-            Box::new(Lambertian {
-                albedo: Vec3::new(0.1, 0.2, 0.5),
-            }),
-        ),
-        Sphere::boxed(
-            Vec3::new(0., -100.5, -1.),
-            100.,
-            Box::new(Lambertian {
-                albedo: Vec3::new(0.8, 0.8, 0.),
-            }),
-        ),
-        Sphere::boxed(
-            Vec3::new(1., 0., -1.),
-            0.5,
-            Metal::boxed(Vec3::new(0.8, 0.6, 0.2), 0.0),
-        ),
-        Sphere::boxed(
-            Vec3::new(-1., 0., -1.),
-            0.5,
-            Box::new(Dielectric { ref_idx: 1.5 }),
-        ),
-        Sphere::boxed(
-            Vec3::new(-1., 0., -1.),
-            -0.45,
-            Box::new(Dielectric { ref_idx: 1.5 }),
-        ),
-    ];
-    let look_from = Vec3::new(3.0, 3.0, 2.0);
-    let look_at = Vec3::new(0., 0., -1.);
-    let aperture = 2.0;
+    let look_from = Vec3::new(13.0, 2.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let aperture = 0.1;
+    let vertical_fov = 20.;
     let dist_to_focus = (look_from - look_at).length();
     let cam = Camera::viewport(
         look_from,
         look_at,
         Vec3::new(0., 1., 0.),
-        20.,
+        vertical_fov,
         width as Real / height as Real,
         aperture,
         dist_to_focus,
     );
 
     let mut rng = rand::thread_rng();
+    println!("Let's go, rays!");
     let now = Instant::now();
     // Iterate over the coordinates and pixels of the image
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
@@ -85,7 +57,7 @@ fn main() {
     println!("Time: {} ms", now.elapsed().as_millis());
 
     // Save the image, the format is deduced from the path
-    imgbuf.save("eye_candy/focused_camera.png").unwrap();
+    imgbuf.save("eye_candy/ball_heaven.png").unwrap();
 }
 
 fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
@@ -115,4 +87,77 @@ fn random_in_unit_sphere() -> Vec3 {
         p.dot(&p) >= 1.
     } { /* Black magic; do-while loop. */ }
     p
+}
+
+pub fn random_scene() -> HitableList {
+    let mut list: HitableList = Vec::new();
+    list.push(Sphere::boxed(
+        Vec3::new(0., -1000., 0.),
+        1000.,
+        Box::new(Lambertian {
+            albedo: Vec3::new(0.5, 0.5, 0.5),
+        }),
+    ));
+    let mut rng = rand::thread_rng();
+    let mut noise = || rng.gen::<Real>();
+    for a in -11..11 {
+        for b in -11..11 {
+            let a = a as Real;
+            let b = b as Real; 
+            let choosen_mat = noise();
+            let center = Vec3::new(a + 0.9 * noise(), 0.2, b + 0.9 * noise());
+            if (center - Vec3::new(4., 0.2, 0.)).length() > 0.9 {
+                if choosen_mat < 0.8 {  // diffuse
+                    list.push(Sphere::boxed(
+                        center,
+                        0.2,
+                        Box::new(Lambertian {
+                            albedo: Vec3::new(noise() * noise(), noise() * noise(), noise() * noise()),
+                        }),
+                    ));
+                }
+                else if choosen_mat < 0.95 {  // metal
+                    list.push(Sphere::boxed(
+                        center,
+                        0.2,
+                        Box::new(Metal::new(
+                            Vec3::new(0.5 * (1. + noise()), 0.5 * (1. + noise()), 0.5 * noise()),
+                            0.5 * noise()
+                        )),
+                    ));
+                }
+                else {  // glass
+                    list.push(Sphere::boxed(
+                        center,
+                        0.2,
+                        Box::new(Dielectric {
+                            ref_idx: 1.5,
+                        }),
+                    ));
+                }
+            }
+        }
+    }
+
+    list.push(Sphere::boxed(
+        Vec3::new(0., 1., 0.),
+        1.0,
+        Box::new(Dielectric {
+            ref_idx: 1.5,
+        }),
+    ));
+    list.push(Sphere::boxed(
+        Vec3::new(-4., 1., 0.),
+        1.0,
+        Box::new(Lambertian {
+            albedo: Vec3::new(0.4, 0.2, 0.1),
+        }),
+    ));
+    list.push(Sphere::boxed(
+        Vec3::new(4., 1., 0.),
+        1.0,
+        Metal::boxed( Vec3::new(0.7, 0.6, 0.5), 0. ),
+    ));
+
+    list
 }
