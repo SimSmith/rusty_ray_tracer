@@ -1,7 +1,7 @@
 use crate::material::Material;
 use crate::ray::Ray;
-use vec3::Real;
-use vec3::Vec3;
+use crate::vec3::Real;
+use crate::vec3::Vec3;
 
 pub struct HitRecord<'a> {
     pub t: Real,

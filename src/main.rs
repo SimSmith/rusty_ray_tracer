@@ -2,12 +2,13 @@ mod camera;
 mod hitable;
 mod material;
 mod ray;
+mod vec3;
 
 use camera::Camera;
 use hitable::{Hitable, HitableList, Sphere};
 use image::{ImageBuffer, Rgb};
 use material::{Dielectric, Lambertian, Metal};
-use rand::Rng;
+use rand::{Rng, SeedableRng, rngs::StdRng};
 use ray::Ray;
 use std::time::Instant;
 use vec3::Real;
@@ -60,7 +61,7 @@ fn main() {
     imgbuf.save("eye_candy/ball_heaven.png").unwrap();
 }
 
-fn color(r: &Ray, world: &HitableList, depth: i32) -> Vec3 {
+fn color(r: &Ray, world: &Hitable, depth: usize) -> Vec3 {
     let eps = 0.001; // to get rid of shadow acne
     if let Some(rec) = world.hit(r, eps, std::f32::MAX) {
         let opt = rec.mat.scatter(r, rec.p, rec.normal);
@@ -98,21 +99,30 @@ pub fn random_scene() -> HitableList {
             albedo: Vec3::new(0.5, 0.5, 0.5),
         }),
     ));
-    let mut rng = rand::thread_rng();
+    let mut rng: StdRng = SeedableRng::seed_from_u64(0);
+    // let mut rng = rand::thread_rng();
     let mut noise = || rng.gen::<Real>();
     for a in -11..11 {
         for b in -11..11 {
             let a = a as Real;
             let b = b as Real; 
             let choosen_mat = noise();
-            let center = Vec3::new(a + 0.9 * noise(), 0.2, b + 0.9 * noise());
+            let center = Vec3::new(
+                a + 0.9 * noise(),
+                0.2,
+                b + 0.9 * noise()
+            );
             if (center - Vec3::new(4., 0.2, 0.)).length() > 0.9 {
                 if choosen_mat < 0.8 {  // diffuse
                     list.push(Sphere::boxed(
                         center,
                         0.2,
                         Box::new(Lambertian {
-                            albedo: Vec3::new(noise() * noise(), noise() * noise(), noise() * noise()),
+                            albedo: Vec3::new(
+                                noise() * noise(),
+                                noise() * noise(),
+                                noise() * noise()
+                            ),
                         }),
                     ));
                 }
@@ -121,7 +131,11 @@ pub fn random_scene() -> HitableList {
                         center,
                         0.2,
                         Box::new(Metal::new(
-                            Vec3::new(0.5 * (1. + noise()), 0.5 * (1. + noise()), 0.5 * noise()),
+                            Vec3::new(
+                                0.5 * (1. + noise()),
+                                0.5 * (1. + noise()),
+                                0.5 * noise()
+                            ),
                             0.5 * noise()
                         )),
                     ));

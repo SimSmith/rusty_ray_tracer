@@ -1,6 +1,6 @@
 use crate::ray::Ray;
-use vec3::Real;
-use vec3::Vec3;
+use crate::vec3::Real;
+use crate::vec3::Vec3;
 use rand::Rng;
 use std::f32::consts;
 

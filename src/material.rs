@@ -1,7 +1,7 @@
 use crate::ray::Ray;
 use rand::Rng;
-use vec3::Real;
-use vec3::Vec3;
+use crate::vec3::Real;
+use crate::vec3::Vec3;
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)>;
