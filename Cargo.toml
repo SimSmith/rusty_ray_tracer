@@ -5,5 +5,6 @@ authors = ["Smith <greatsimonsmith@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-image = "0.21"
+image = "0.22"
 rand = "0.7"
+rayon = "1.1"

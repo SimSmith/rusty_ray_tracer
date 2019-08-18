@@ -10,7 +10,7 @@ pub struct HitRecord<'a> {
     pub mat: &'a Box<Material>,
 }
 
-pub trait Hitable {
+pub trait Hitable: Sync {
     fn hit(&self, r: &Ray, t_min: Real, t_max: Real) -> Option<HitRecord>;
 }
 

@@ -10,6 +10,7 @@ use image::{ImageBuffer, Rgb};
 use material::{Dielectric, Lambertian, Metal};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use ray::Ray;
+use rayon::prelude::*;
 use std::time::Instant;
 use vec3::Real;
 use vec3::Vec3;
@@ -19,7 +20,6 @@ fn main() {
     let height = 100;
     let n_samples = 100;
 
-    let mut imgbuf = ImageBuffer::new(width, height);
     let world = random_scene();
 
     let look_from = Vec3::new(13.0, 2.0, 3.0);
@@ -37,28 +37,38 @@ fn main() {
         dist_to_focus,
     );
 
-    let mut rng = rand::thread_rng();
     println!("Let's go, rays!");
     let now = Instant::now();
     // Iterate over the coordinates and pixels of the image
+    let pixels: Vec<Vec<Rgb<u8>>> = (0..width)
+        .into_par_iter()
+        .map(|x|{
+            let mut rng = rand::thread_rng();
+            (0..height).map(|y| {
+                let mut col = Vec3::new(0., 0., 0.);
+                for _ in 0..n_samples {
+                    let u = (x as Real + rng.gen::<Real>()) / (width as Real);
+                    let v = (y as Real + rng.gen::<Real>()) / (height as Real);
+                    let r = cam.get_ray(u, v);
+                    col += color(&r, &world, 0);
+                }
+                col /= n_samples as Real;
+                col = Vec3::new(col.x.sqrt(), col.y.sqrt(), col.z.sqrt()); // gamma 2
+                let rgb = 255.99 * col;
+
+                Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8])
+            }).collect()
+        }).collect();
+
+    // Fill image buffer and save the image
+    let mut imgbuf = ImageBuffer::new(width, height);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let mut col = Vec3::new(0., 0., 0.);
-        for _ in 0..n_samples {
-            let u = (x as Real + rng.gen::<Real>()) / (width as Real);
-            let v = (y as Real + rng.gen::<Real>()) / (height as Real);
-            let r = cam.get_ray(u, v);
-            col += color(&r, &world, 0);
-        }
-        col /= n_samples as Real;
-        col = Vec3::new(col.x.sqrt(), col.y.sqrt(), col.z.sqrt()); // gamma 2
-        let rgb = 255.99 * col;
-
-        *pixel = Rgb([rgb.x as u8, rgb.y as u8, rgb.z as u8]);
+        *pixel = pixels[x as usize][y as usize];
     }
-    println!("Time: {} ms", now.elapsed().as_millis());
-
-    // Save the image, the format is deduced from the path
+    // The format is deduced from the path
     imgbuf.save("eye_candy/ball_heaven.png").unwrap();
+
+    println!("Time: {} ms", now.elapsed().as_millis());
 }
 
 fn color(r: &Ray, world: &Hitable, depth: usize) -> Vec3 {

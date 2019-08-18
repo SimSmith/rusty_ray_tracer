@@ -3,7 +3,7 @@ use rand::Rng;
 use crate::vec3::Real;
 use crate::vec3::Vec3;
 
-pub trait Material {
+pub trait Material: Sync {
     fn scatter(&self, r_in: &Ray, point: Vec3, normal: Vec3) -> Option<(Vec3, Ray)>;
 }
 
