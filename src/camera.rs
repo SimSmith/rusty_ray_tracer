@@ -2,7 +2,7 @@ use crate::ray::Ray;
 use crate::vec3::Real;
 use crate::vec3::Vec3;
 use rand::Rng;
-use std::f32::consts;
+use std::f64::consts;
 
 #[derive(Debug)]
 pub struct Camera {

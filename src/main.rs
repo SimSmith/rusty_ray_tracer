@@ -12,13 +12,38 @@ use rand::{Rng, SeedableRng, rngs::StdRng};
 use ray::Ray;
 use rayon::prelude::*;
 use std::time::Instant;
-use vec3::Real;
-use vec3::Vec3;
+use vec3::{Real, Vec3};
+use structopt::StructOpt;
+
+#[derive(StructOpt, Debug)]
+#[structopt(
+    name = "Rusty Ray Tracer",
+    about = "Generates an image using a path tracer based on \"Ray Tracing in One Weekend\"."
+)]
+struct Opt {
+    /// Width of the generated picture
+    #[structopt(short, long, default_value = "200")]
+    width: u32,
+
+    /// Height of the generated picture
+    #[structopt(short, long, default_value = "100")]
+    height: u32,
+
+    /// Number of rays sampled per pixel
+    #[structopt(short="s", long, default_value = "100")]
+    n_samples: u32,
+
+    /// Output filename
+    #[structopt(short="f", long="file", default_value = "eye_candy/ball_heaven.png")]
+    output_file: String,
+}
 
 fn main() {
-    let width = 200;
-    let height = 100;
-    let n_samples = 100;
+    let opt = Opt::from_args();
+
+    let width = opt.width;
+    let height = opt.height;
+    let n_samples = opt.n_samples;
 
     let world = random_scene();
 
@@ -65,15 +90,19 @@ fn main() {
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         *pixel = pixels[x as usize][y as usize];
     }
-    // The format is deduced from the path
-    imgbuf.save("eye_candy/ball_heaven.png").unwrap();
-
     println!("Time: {} ms", now.elapsed().as_millis());
+
+    // The format is deduced from the path
+    if let Err(e) = imgbuf.save(opt.output_file) {
+        let backup_file = "backup_image.png";
+        println!("\nError while saving:\n{}\nWriting to \"{}\" instead.", e, backup_file);
+        imgbuf.save(backup_file).unwrap();
+    }
 }
 
-fn color(r: &Ray, world: &Hitable, depth: usize) -> Vec3 {
+fn color(r: &Ray, world: &dyn Hitable, depth: usize) -> Vec3 {
     let eps = 0.001; // to get rid of shadow acne
-    if let Some(rec) = world.hit(r, eps, std::f32::MAX) {
+    if let Some(rec) = world.hit(r, eps, std::f64::MAX) {
         let opt = rec.mat.scatter(r, rec.p, rec.normal);
         if opt.is_some() && depth < 50 {
             let (attenuation, scattered) = opt.unwrap();

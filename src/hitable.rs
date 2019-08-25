@@ -7,7 +7,7 @@ pub struct HitRecord<'a> {
     pub t: Real,
     pub p: Vec3,
     pub normal: Vec3,
-    pub mat: &'a Box<Material>,
+    pub mat: &'a Box<dyn Material>,
 }
 
 pub trait Hitable: Sync {

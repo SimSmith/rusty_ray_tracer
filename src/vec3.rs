@@ -6,7 +6,7 @@ use std::ops::Mul;
 use std::ops::Neg;
 use std::ops::Sub;
 
-pub type Real = f32;
+pub type Real = f64;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3 {
