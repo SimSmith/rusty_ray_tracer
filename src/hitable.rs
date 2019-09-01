@@ -52,37 +52,39 @@ impl Sphere {
 
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: Real, t_max: Real) -> Option<HitRecord> {
-        let oc = r.origin() - self.center;
-        let a = r.direction().dot(&r.direction());
-        let b = oc.dot(&r.direction());
-        let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - a * c;
-        if discriminant > 0. {
-            let temp = (-b - discriminant.sqrt()) / a;
-            if temp < t_max && temp > t_min {
-                let t = temp;
-                let p = r.point_at_parameter(t);
-                let normal = (p - self.center) / self.radius;
-                return Some(HitRecord {
-                    t,
-                    p,
-                    normal,
-                    mat: &self.mat,
-                });
-            }
-            let temp = (-b + discriminant.sqrt()) / a;
-            if temp < t_max && temp > t_min {
-                let t = temp;
-                let p = r.point_at_parameter(t);
-                let normal = (p - self.center) / self.radius;
-                return Some(HitRecord {
-                    t,
-                    p,
-                    normal,
-                    mat: &self.mat,
-                });
-            }
+
+        let oc =  self.center - r.origin();
+        let s = oc.dot(&r.direction());
+        let oc_squared_len = oc.dot(&oc);
+        let radius_squared = self.radius * self.radius;
+        
+        if s < 0. && oc_squared_len > radius_squared {
+            return None
         }
-        None
+
+        let m_squared = oc_squared_len - s * s;
+        if  m_squared > radius_squared {
+            return None
+        }
+
+        let q = (radius_squared - m_squared).sqrt();
+        let t = if oc_squared_len > radius_squared {
+            s - q
+        } else {
+            s + q
+        };
+
+        if t < t_min || t > t_max {
+            return None
+        }
+
+        let p = r.point_at_parameter(t);
+        let normal = (p - self.center) / self.radius;
+        Some(HitRecord {
+            t,
+            p,
+            normal,
+            mat: &self.mat,
+        })
     }
 }
